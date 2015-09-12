@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Table BOOM!</title>
+</head>
+<body>
+	<script>
+
+// Random number
+ var rand = function(min, max) {
+  return Math.floor(Math.random()*(max-min) + 0.5) + min;
+ }
+
+// Random Color
+ var get_random_color = function () {
+     //return "#"+((1<<24)*Math.random()|0).toString(16);
+     return ("rgb(" + rand(100,255) + "," + rand(100,255) + "," + rand(100,255))
+ }
+
+// Create table with random background color of cells
+var tds = 10,
+trs = 10,
+table = document.createElement("table");
+for (var i = 0; i < tds; i++) {
+	var tr = document.createElement("tr");
+	for (var j = 0; j < trs; j++) {
+		var td = document.createElement("td");
+		td.textContent = '' + rand(10,99);
+		tr.appendChild(td);
+		td.style.border = "thin solid #000";
+		td.style.padding = "4px";
+	}
+	table.appendChild(tr);
+}
+document.body.appendChild(table);
+table.style.position = 'absolute';
+table.style.left = (document.documentElement.clientWidth/2)-(table.clientWidth/2) + 'px';
+table.style.top = (document.documentElement.clientHeight/2)-(table.clientHeight/2) + 'px';
+table.style.borderSpacing = "0";
+
+// addDiv("ЧТОБЫ ТАБЛИЦА РАСПОЛЗЛАСЬ, КЛИКНИТЕ НА НЕЁ!")
+
+// remember the position and contents of the cells
+var list = document.getElementsByTagName("td");
+var tds = [];
+
+for (var i = 0; i < list.length; i++) {
+	 	list[i].style.backgroundColor = "" + get_random_color();
+	 	tds[i] = {
+	 		td: list[i],
+	 		offTop: list[i].offsetTop,
+	 		offLeft: list[i].offsetLeft,
+	 		dirX: !!rand(0,1),
+	 		dirY: !!rand(0,1)
+	 	};
+};
+
+for (var i = 0; i < list.length; i++) {
+	list[i] = tds[i].td;
+	list[i].style.position = 'absolute';
+	list[i].style.top = tds[i].offTop + 'px';
+	list[i].style.left = tds[i].offLeft + 'px';
+};
+
+// Boom of table with random direction
+function boom() {
+	for (var i = 0; i < list.length; i++) {
+		list[i] = tds[i].td;
+		if (tds[i].dirX) {
+			list[i].style.left = list[i].offsetLeft + 5 + 'px';
+		} else {
+			list[i].style.left = list[i].offsetLeft - 5 + 'px';
+		};
+		if (tds[i].dirY) {
+			list[i].style.top = list[i].offsetTop + 5 + 'px';
+		} else {
+			list[i].style.top = list[i].offsetTop - 5 + 'px';
+		};
+		tds[i].dirX = !!rand(0,1); // каждый раз задаем новое направление движения
+		tds[i].dirY = !!rand(0,1);
+	}
+}
+
+// Add Text
+function addDiv (text) {
+	var div = document.createElement('div');
+	document.body.appendChild(div);
+	div.textContent = text;
+	div.setAttribute('style', "text-align: center");
+}
+
+// Speed of moving
+function boomGo() {
+	interval = setInterval (boom,50);
+	timerId = setTimeout(stopMoving(interval,list,tds),5000)
+}
+
+function stopMoving(inter,listT,tdsT) {
+    return function () {
+        clearInterval(inter);
+        antiBoom(listT,tdsT);
+        //
+    };
+};
+
+function antiBoom(listT2,tdsT2) {
+    for (var i = 0; i < listT2.length; i++) {
+		if (listT2[i].offsetLeft != tdsT2[i].offLeft) {
+			list[i].style.transition = 'all 3s linear';
+			list[i].style.setProperty("-webkit-transition", "all 3s linear");
+			list[i].style.top = tds[i].offTop + 'px';
+			list[i].style.left = tds[i].offLeft + 'px';
+		};
+    };
+}
+
+// Moving is going on when user click on table
+table.addEventListener("click", boomGo);
+
+	</script>
+</body>
+</html>
+
